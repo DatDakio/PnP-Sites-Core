@@ -516,8 +516,19 @@ namespace Microsoft.SharePoint.Client
 
             web.Context.ExecuteQueryRetry();
 
-            var foundTerm = term.First();
-
+            web.UpdateTaxonomyFieldDefaultValue(termName, listName, fieldInternalName, term.First());
+        }
+        
+        /// <summary>
+        /// Sets the default value for a managed metadata column in the specified list. This operation will not change existing items in the list
+        /// </summary>
+        /// <param name="web">Extension web</param>
+        /// <param name="termName">Name of a specific term</param>
+        /// <param name="listName">Name of list</param>
+        /// <param name="fieldInternalName">Internal name of field</param>
+        /// <param name="term">Term to be set as defaut value</param>
+        public static void UpdateTaxonomyFieldDefaultValue(this Web web, string termName, string listName, string fieldInternalName, Term term)
+        {
             var list = web.GetListByTitle(listName);
 
             var fields = web.Context.LoadQuery(list.Fields.Where(f => f.InternalName == fieldInternalName));
@@ -533,7 +544,7 @@ namespace Microsoft.SharePoint.Client
                 LeafName = string.Concat("Temporary_Folder_For_WssId_Creation_", DateTime.Now.ToFileTime().ToString())
             });
 
-            item.SetTaxonomyFieldValue(taxField.Id, foundTerm.Name, foundTerm.Id);
+            item.SetTaxonomyFieldValue(taxField.Id, term.Name, term.Id);
 
             web.Context.Load(item);
             web.Context.ExecuteQueryRetry();
